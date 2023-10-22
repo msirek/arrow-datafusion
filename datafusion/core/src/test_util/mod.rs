@@ -116,6 +116,14 @@ impl TableProviderFactory for TestTableFactory {
             schema: Arc::new(cmd.schema.as_ref().into()),
         }))
     }
+
+    async fn get_inferred_schema_ref(
+        &self,
+        state: &SessionState,
+        cmd: &CreateExternalTable,
+    ) -> Option<SchemaRef> {
+        None
+    }
 }
 
 /// TableProvider for testing purposes

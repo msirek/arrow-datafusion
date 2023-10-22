@@ -459,6 +459,20 @@ impl SessionContext {
         self.execute_logical_plan(plan).await
     }
 
+    pub async fn get_inferred_schema(&self, plan: &LogicalPlan) -> Option<SchemaRef> {
+        match plan {
+            LogicalPlan::Ddl(ddl) => match ddl {
+                DdlStatement::CreateExternalTable(cmd) => {
+                    self.get_inferred_schema2(&cmd).await
+                }
+                _ => {
+                    None
+                },
+            }
+            _ => None
+        }
+    }
+
     /// Execute the [`LogicalPlan`], return a [`DataFrame`]. This API
     /// is not featured limited (so all SQL such as `CREATE TABLE` and
     /// `COPY` will be run).
@@ -750,6 +764,26 @@ impl SessionContext {
                 })?;
         let table = (*factory).create(&state, cmd).await?;
         Ok(table)
+    }
+
+    async fn get_inferred_schema2(
+        &self,
+        cmd: &CreateExternalTable,
+    ) -> Option<SchemaRef> {
+        let state = self.state.read().clone();
+        let file_type = cmd.file_type.to_uppercase();
+        let factory =
+            &state
+                .table_factories
+                .get(file_type.as_str())
+                .ok_or_else(|| {
+                    DataFusionError::Execution(format!(
+                        "Unable to find factory for {}",
+                        cmd.file_type
+                    ))
+                }).ok()?;
+        let schema_ref = (*factory).get_inferred_schema_ref(&state, cmd).await?;
+        Some(schema_ref)
     }
 
     async fn find_and_deregister<'a>(

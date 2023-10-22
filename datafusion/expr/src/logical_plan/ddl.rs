@@ -24,6 +24,7 @@ use std::{
 
 use crate::{Expr, LogicalPlan};
 
+use datafusion_common::arrow::datatypes::SchemaRef;
 use datafusion_common::parsers::CompressionTypeVariant;
 use datafusion_common::{
     Constraints, DFSchemaRef, OwnedSchemaReference, OwnedTableReference,
@@ -195,6 +196,27 @@ pub struct CreateExternalTable {
     /// The list of constraints in the schema, such as primary key, unique, etc.
     pub constraints: Constraints,
 }
+
+// impl CreateExternalTable {
+//     // This is a method
+//     // `&self` is sugar for `self: &Self`, where `Self` is the type of the
+//     // caller object. In this case `Self` = `Rectangle`
+//     fn area(&self) -> SchemaRef {
+//         let state = self.state.read().clone();
+//         let file_type = cmd.file_type.to_uppercase();
+//         let factory =
+//             &state
+//                 .table_factories
+//                 .get(file_type.as_str())
+//                 .ok_or_else(|| {
+//                     DataFusionError::Execution(format!(
+//                         "Unable to find factory for {}",
+//                         cmd.file_type
+//                     ))
+//                 })?;
+//         let file_compression_type = FileCompressionType::from(cmd.file_compression_type);
+//     }
+// }  // msirek-temp
 
 // Hashing refers to a subset of fields considered in PartialEq.
 impl Hash for CreateExternalTable {

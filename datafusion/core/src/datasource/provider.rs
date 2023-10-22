@@ -213,4 +213,10 @@ pub trait TableProviderFactory: Sync + Send {
         state: &SessionState,
         cmd: &CreateExternalTable,
     ) -> Result<Arc<dyn TableProvider>>;
+
+    async fn get_inferred_schema_ref(
+        &self,
+        state: &SessionState,
+        cmd: &CreateExternalTable,
+    ) -> Option<SchemaRef>;
 }

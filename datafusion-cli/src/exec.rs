@@ -223,6 +223,9 @@ async fn exec_and_print(
 
         let df = match &plan {
             LogicalPlan::Ddl(DdlStatement::CreateExternalTable(cmd)) => {
+                if !cmd.order_exprs.is_empty() && cmd.schema.fields().is_empty() {
+                    let schema = ctx.get_inferred_schema(&plan).await;
+                }
                 create_external_table(ctx, cmd).await?;
                 ctx.execute_logical_plan(plan).await?
             }

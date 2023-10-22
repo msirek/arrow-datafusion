@@ -16,6 +16,7 @@
 // under the License.
 
 use std::collections::{BTreeMap, HashMap, HashSet};
+use std::ops::Deref;
 use std::sync::Arc;
 
 use crate::parser::{
@@ -134,6 +135,11 @@ fn calc_inline_constraints_from_columns(columns: &[ColumnDef]) -> Vec<TableConst
 impl<'a, S: ContextProvider> SqlToRel<'a, S> {
     /// Generate a logical plan from an DataFusion SQL statement
     pub fn statement_to_plan(&self, statement: DFStatement) -> Result<LogicalPlan> {
+        let schema_provider = self.deref().schema_provider;
+        // if let Some(sp) = schema_provider.as_any().downcast_ref::<SessionContextProvider>() {
+        //     // msirek-temp
+        // }
+
         match statement {
             DFStatement::CreateExternalTable(s) => self.external_table_to_plan(s),
             DFStatement::Statement(s) => self.sql_statement_to_plan(*s),
